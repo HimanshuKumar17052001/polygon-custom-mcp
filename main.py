@@ -306,5 +306,6 @@ async def list_prediction_market_graph(
     ]
 
 
+# Driver code to run the MCP server
 if __name__ == "__main__":
     mcp.run(transport="stdio")
