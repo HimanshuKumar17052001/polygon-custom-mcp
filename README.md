@@ -1,86 +1,166 @@
-# Polymarket Custom MCP
+# polygon-custom-mcp
 
-A custom [MCP](https://github.com/microsoft/mcp) (Multi-Tool Control Protocol) server for interacting with Polymarket prediction markets on Polygon. This toolkit exposes tools to search markets, fetch live orderbooks, and retrieve historical price data, making it easy to integrate with LLMs (like Claude, GPT-4, etc.) or other MCP-compatible clients.
+A custom MCP server for Polymarket's CLOB API, built with Python and uv.
 
-## Features
-- **List prediction markets** by search query
-- **Fetch live orderbooks** for all outcomes in a market
-- **Retrieve historical price series** for a market
-- Designed for use with LLMs and MCP clients
+## Overview
 
-## Requirements
-- Python 3.12+
-- Polygon/Polymarket API credentials (see Environment Variables)
+This MCP server exposes three tools to Claude (or any MCP-compatible client):
+
+* `list_markets`: Search prediction markets by keyword
+* `get_orderbook`: Fetch live orderbook (best bid/ask) for each outcome
+* `get_history`: Retrieve historical price series for a market
+
+## Prerequisites
+
+- OS: Windows, macOS, or Linux
+- Python: 3.8+
+- uv package manager (installed globally)
+- Virtual environment (recommended)
+- Environment variables (in a `.env` file):
+
+```
+CLOB_HOST=https://clob.polymarket.com
+PK=<your-Polymarket-private-key>
+CLOB_API_KEY=<your-API-key>
+CLOB_SECRET=<your-API-secret>
+CLOB_PASS_PHRASE=<your-API-passphrase>
+```
+
+## Project Structure
+
+```
+polygon-custom-mcp/
+├── main.py
+├── requirements.txt
+├── .env
+└── README.md
+```
+
+* `main.py`: MCP server implementation
+* `requirements.txt`: Python dependencies
+* `.env`: your Polymarket credentials (never commit to Git!)
 
 ## Installation
 
-1. **Clone the repository:**
-   ```sh
-git clone <YOUR_GITHUB_URL>
+### 1. Install the uv CLI
+
+Windows (PowerShell as Administrator):
+```
+irm https://astral.sh/uv/install.ps1 | iex
+```
+
+macOS / Linux (bash, zsh, etc.):
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Or via pip / pipx:
+```
+pip install uv
+pipx install uv
+```
+
+### 2. Clone & Set Up the Project
+
+```
+git clone https://github.com/himanshu/polygon-custom-mcp.git
 cd polygon-custom-mcp
 ```
 
-2. **Install dependencies:**
-   ```sh
+### 3. Initialize your uv project
+
+```
+uv init
+```
+
+### 4. Create & activate a virtual environment
+
+Windows PowerShell:
+```
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+```
+python -m venv venv
+source venv/bin/activate
+```
+
+### 5. Install dependencies
+
+```
+uv add mcp[cli] py-clob-client python-dotenv requests
+```
+
+-- OR --
+
+```
 pip install -r requirements.txt
-# or, if using poetry or pip-tools, use your preferred tool
 ```
 
-3. **Set up environment variables:**
-   Create a `.env` file in the project root with the following variables:
-   ```env
-PK=your_polygon_private_key
-CLOB_API_KEY=your_clob_api_key
-CLOB_SECRET=your_clob_secret
-CLOB_PASS_PHRASE=your_clob_passphrase
-CLOB_HOST=https://clob.polymarket.com  # (optional, default shown)
-```
+## Configuration for Claude Desktop
 
-## Usage
+For Claude Desktop, edit your `claude_desktop_config.json` file:
+- Windows: Located at `%APPDATA%\Claude\claude_desktop_config.json`
+- macOS: Located at `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-Start the MCP server (stdio transport):
-```sh
-python main.py
-```
+Add the following to your configuration file (replace the directory path with your actual project location):
 
-The server will expose the following tools to any MCP-compatible client:
-
-### Tools
-- `list_markets`: Search prediction markets by query
-- `get_orderbook`: Get live orderbook for all outcomes of a market
-- `get_history`: Get historical price series for a market
-
-### Example MCP Query (pseudo-code)
-```
-# List markets containing 'US election'
+```json
 {
-  "tool": "list_markets",
-  "arguments": {"query": "US election"}
-}
-
-# Get orderbook for a specific market
-{
-  "tool": "get_orderbook",
-  "arguments": {"condition_id": "0x..."}
-}
-
-# Get price history for a market
-{
-  "tool": "get_history",
-  "arguments": {"condition_id": "0x...", "interval": "1d"}
+  "mcpServers": {
+    "brave-search": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "BRAVE_API_KEY",
+        "mcp/brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_API_KEY"
+      }
+    },
+    "polygon-custom-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp",
+        "run",
+        "main.py"
+      ]
+    }
+  }
 }
 ```
 
-## Environment Variables
-- `PK`: Polygon private key (required)
-- `CLOB_API_KEY`: Polymarket CLOB API key (required)
-- `CLOB_SECRET`: Polymarket CLOB API secret (required)
-- `CLOB_PASS_PHRASE`: Polymarket CLOB API passphrase (required)
-- `CLOB_HOST`: (optional) CLOB API host URL (default: `https://clob.polymarket.com`)
+**Important Notes:**
+- Replace `YOUR_API_KEY` with your actual Brave Search API key
+- Replace `C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp` with the actual path to your project folder
+- Use double backslashes (\\\\) for Windows file paths in the JSON configuration
 
-## License
-MIT
+## Running the Server
 
-## Acknowledgments
-- [Polymarket](https://polymarket.com)
-- [MCP Protocol](https://github.com/microsoft/mcp)
+```
+uv run main.py
+```
+
+You should see:
+```
+[MCP] polygon-custom-mcp listening on stdio...
+```
+
+## Testing the Tools
+
+Use your MCP client or the CLI to call:
+
+```
+mcp call polygon-custom-mcp list_markets '{"query":"bitcoin"}'
+mcp call polygon-custom-mcp get_orderbook '{"condition_id":"0x..."}'
+mcp call polygon-custom-mcp get_history '{"condition_id":"0x...","interval":"1d"}'
+```
+
+Replace `0x...` with an actual condition_id.
