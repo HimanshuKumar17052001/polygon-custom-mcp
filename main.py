@@ -1,14 +1,10 @@
 from __future__ import annotations
 import os
-import datetime as _dt
 from typing import Any, Dict, List, Optional
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
-import mcp.types as types
 from py_clob_client.client import ClobClient, ApiCreds
-from py_clob_client.clob_types import BookParams
 from py_clob_client.constants import POLYGON
-import time
 import requests
 
 load_dotenv()
@@ -33,7 +29,7 @@ client = _new_clob()
 
 
 @mcp.tool()
-async def list_all_prediction_markets(
+def list_all_prediction_markets(
     query: Optional[str] = None, condition_id: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
@@ -131,7 +127,7 @@ async def list_all_prediction_markets(
 
 
 @mcp.tool()
-async def list_prediction_market_orderbook(
+def list_prediction_market_orderbook(
     condition_id: str,
     snapshot_time: Optional[str] = None,
 ) -> Dict[str, Any]:
@@ -265,7 +261,7 @@ def _fetch_interval(
 
 
 @mcp.tool()
-async def list_prediction_market_graph(
+def list_prediction_market_graph(
     condition_id: str,
     interval: str = "1d",
     fidelity: int = 50,
