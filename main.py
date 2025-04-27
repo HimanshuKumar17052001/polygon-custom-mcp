@@ -1,5 +1,4 @@
 from __future__ import annotations
-import asyncio
 import os
 import datetime as _dt
 from typing import Any, Dict, List, Optional
@@ -11,8 +10,6 @@ from py_clob_client.clob_types import BookParams
 from py_clob_client.constants import POLYGON
 import time
 import requests
-from datetime import datetime
-import json
 
 load_dotenv()
 
