@@ -153,14 +153,22 @@ You should see:
 [MCP] polygon-custom-mcp listening on stdio...
 ```
 
-## Testing the Tools
+## Testing the Tools in Claude Desktop
 
-Use your MCP client or the CLI to call:
+Once you have set up the MCP server:
 
-```
-mcp call polygon-custom-mcp list_markets '{"query":"bitcoin"}'
-mcp call polygon-custom-mcp get_orderbook '{"condition_id":"0x..."}'
-mcp call polygon-custom-mcp get_history '{"condition_id":"0x...","interval":"1d"}'
-```
+1. Start the server by running `uv run main.py` in your terminal
+2. Launch Claude Desktop
+3. In the Claude Desktop interface, you can interact with the Polymarket tools and Brave Web Search using natural language:
 
-Replace `0x...` with an actual condition_id.
+For example, you can ask Claude:
+- "Search for Bitcoin prediction markets on Polymarket"
+- "What's the current orderbook for the market with condition ID 0x1234...?"
+- "Show me the price history for market 0xabcd... over the past week"
+
+Claude will automatically utilize the appropriate Polymarket tools and Brave Web Search to fetch and display the requested information.
+
+Notes:
+- For `get_orderbook` and `get_history` commands, you'll need to provide a valid Polymarket condition ID v.i.z. ID of the market
+- You can find condition IDs by first searching for markets using the `list_markets` functionality
+- If MCP fails to load in Claude Desktop, then quit the Claude Desktop and launch it again, it would be fixed
