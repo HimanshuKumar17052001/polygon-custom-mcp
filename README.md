@@ -138,9 +138,12 @@ Add the following to your configuration file (replace the directory path with yo
 ```
 
 **Important Notes:**
-- Replace `YOUR_API_KEY` with your actual Brave Search API key
-- Replace `C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp` with the actual path to your project folder
-- Use double backslashes (\\\\) for Windows file paths in the JSON configuration
+
+- To use the **Brave Search** MCP tool, you **must** have **Docker installed** on your machine. See the [official Docker installation guide](https://docs.docker.com/get-docker/) for instructions.
+- Replace `YOUR_API_KEY` with your actual Brave Search API key.
+- Replace `C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp` with the path to your project directory.
+- Use double backslashes (`\\`) for Windows file paths in JSON.
+
 
 ## Running the Server
 
