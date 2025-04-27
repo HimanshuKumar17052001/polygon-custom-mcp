@@ -99,7 +99,7 @@ uv add mcp[cli] py-clob-client python-dotenv requests
 pip install -r requirements.txt
 ```
 
-## Configuration for Claude Desktop
+## Configuring Claude Desktop with our custom MCP and Brave Web Search MCP 
 
 For Claude Desktop, edit your `claude_desktop_config.json` file:
 - Windows: Located at `%APPDATA%\Claude\claude_desktop_config.json`
