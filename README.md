@@ -6,9 +6,9 @@ A custom MCP server for Polymarket's CLOB API, built with Python and uv.
 
 This MCP server exposes three tools to Claude (or any MCP-compatible client):
 
-* `list_markets`: Search prediction markets by keyword
-* `get_orderbook`: Fetch live orderbook (best bid/ask) for each outcome
-* `get_history`: Retrieve historical price series for a market
+* `list_all_prediction_markets`: Search prediction markets by keyword
+* `list_prediction_market_orderbook`: Fetch live orderbook (best bid/ask) for each outcome
+* `list_prediction_market_graph`: Retrieve historical price series for a market
 
 ## Prerequisites
 
@@ -172,6 +172,6 @@ For example, you can ask Claude:
 Claude will automatically utilize the appropriate Polymarket tools and Brave Web Search to fetch and display the requested information.
 
 Notes:
-- For `get_orderbook` and `get_history` commands, you'll need to provide a valid Polymarket condition ID v.i.z. ID of the market
-- You can find condition IDs by first searching for markets using the `list_markets` functionality
+- For `list_prediction_market_orderbook` and `list_prediction_market_graph` commands, you'll need to provide a valid Polymarket condition ID v.i.z. ID of the market
+- You can find condition IDs by first searching for markets using the `list_all_prediction_markets` functionality
 - If MCP fails to load in Claude Desktop, then quit the Claude Desktop and launch it again, it would be fixed
