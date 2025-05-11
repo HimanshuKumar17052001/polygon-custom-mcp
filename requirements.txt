@@ -1,0 +1,6 @@
+python-dotenv
+chromadb
+py-clob-client
+mcp-server
+regex
+requests
