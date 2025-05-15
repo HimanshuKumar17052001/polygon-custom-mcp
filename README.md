@@ -130,7 +130,7 @@ Add the following to your configuration file (replace the directory path with yo
         "--directory",
         "C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp",
         "run",
-        "main.py"
+        "server.py"
       ]
     }
   }
