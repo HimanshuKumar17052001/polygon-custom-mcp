@@ -1,6 +1,8 @@
 # polygon-custom-mcp
 
-A powerful MCP server and CLI-based AI client for interacting with **Polymarket's CLOB API**. This tool enables intelligent querying, forecasting, and visualization of prediction markets using AI and time-series forecasting tools.
+An intelligent MCP server and CLI-based AI client for analyzing the relationship between events listed on Polymarket and their potential impact on an investor's portfolio. This system leverages the Polymarket CLOB API and Brave Web Search to support informed decision-making using prediction market insights.
+
+A powerful MCP server and CLI-based AI client for interacting with Polymarket's CLOB API. This tool enables intelligent querying, forecasting, and visualization of prediction markets using AI and time-series forecasting tools.
 
 ---
 
