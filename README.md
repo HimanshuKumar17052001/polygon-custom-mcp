@@ -238,7 +238,6 @@ polygon-custom-mcp/
 ├── .env                  # Environment config file with credentials (excluded from version control)
 ├── uv.lock               # Lockfile for uv package manager
 ├── README.md             # Project documentation
-```          # Project documentation
 ```
 
 ---
