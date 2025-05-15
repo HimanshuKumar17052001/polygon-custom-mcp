@@ -18,7 +18,7 @@ A command-line interface that uses a **Groq-hosted LLM** and LangChain ReAct Age
 
 ---
 
-## 🛌 Server Tooling Summary
+## 🛠 Server Tooling Summary
 
 ### Available Tools (Defined in `server.py`):
 
@@ -44,7 +44,7 @@ A command-line interface that uses a **Groq-hosted LLM** and LangChain ReAct Age
 
 ---
 
-## 🛌 Client Capabilities (`client.py`)
+## 💬 Client Capabilities (`client.py`)
 
 ### 🪧 Features
 
@@ -54,14 +54,7 @@ A command-line interface that uses a **Groq-hosted LLM** and LangChain ReAct Age
 * Accepts **multi-line queries** via `Ctrl+D` (Linux/macOS) or `Ctrl+Z + Enter` (Windows).
 * Persists conversation history and context for multi-step ReAct flows.
 
-### ⚖️ Tools Used in Client
-
-* **LangChain** + **LangGraph**: For tool agent and ReAct pattern.
-* **langchain\_groq**: For LLM access via Groq API.
-* **rich**: For beautiful CLI formatting.
-* **mcp**: For client/server MCP protocol management.
-
-### 🔨 Client Workflow:
+### ⚙️ Client Workflow
 
 1. Initializes Groq LLM and MCP connection.
 2. Loads all available tools from the server.
@@ -72,44 +65,65 @@ A command-line interface that uses a **Groq-hosted LLM** and LangChain ReAct Age
 
 ---
 
-## ♻️ Technologies & Libraries
+## 🧰 Technologies & Libraries
 
 ### Server:
 
-* **Python 3.8+**
-* `mcp[cli]`: FastMCP server framework
-* `py-clob-client`: SDK for Polymarket CLOB API
-* `requests`: For HTTP calls
-* `chromadb`: Vector DB for semantic search
-* `statsmodels`, `pandas`, `numpy`: Time series forecasting (ARIMA)
-* `.env` config: Loads API keys and credentials
+* Python 3.8+
+* `mcp[cli]` – FastMCP server framework
+* `py-clob-client` – SDK for Polymarket CLOB API
+* `requests` – REST API interaction
+* `chromadb` – Vector DB for semantic search
+* `statsmodels`, `pandas`, `numpy` – ARIMA time series forecasting
+* `python-dotenv`, `regex`, `json`, `asyncio` – Configuration and tooling support
 
 ### Client:
 
-* `langchain`, `langgraph`, `langchain_groq`: Agent + LLM orchestrator
-* `mcp`: Client session handling
-* `rich`: CLI formatting
+* `langchain`, `langgraph`, `langchain_groq` – Agent orchestration and Groq model interface
+* `rich` – CLI rendering
+* `mcp` – Client/server protocol management
 
 ---
 
-## 🌐 Polymarket APIs Used
+## 🌐 APIs Used
 
-* `GET /markets/{condition_id}`
-* `GET /orderbook/{token_id}`
-* `GET /prices-history`
+* `GET /markets/{condition_id}` – Market metadata
+* `GET /orderbook/{token_id}` – Orderbook details
+* `GET /prices-history` – Historical prices
 
 ---
 
 ## ⚙️ Installation
 
-### 1. Clone the Project
+### 1. Install the uv CLI (optional if using uv)
+
+#### Windows (PowerShell as Administrator):
+
+```bash
+irm https://astral.sh/uv/install.ps1 | iex
+```
+
+#### macOS / Linux:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+#### Or via pip / pipx:
+
+```bash
+pip install uv
+pipx install uv
+```
+
+### 2. Clone the Project
 
 ```bash
 git clone https://github.com/himanshu/polygon-custom-mcp.git
 cd polygon-custom-mcp
 ```
 
-### 2. Set Up Environment
+### 3. Set Up Environment
 
 ```bash
 python -m venv venv
@@ -117,26 +131,29 @@ source venv/bin/activate  # or .\venv\Scripts\Activate.ps1 on Windows
 pip install -r requirements.txt
 ```
 
-### 3. Add Your Secrets to `.env`
+### 4. Configure `.env`
 
 ```
 CLOB_HOST=https://clob.polymarket.com
-PK=<your-private-key>
-CLOB_API_KEY=<api-key>
-CLOB_SECRET=<secret>
-CLOB_PASS_PHRASE=<passphrase>
+PK=YOUR_PRIVATE_KEY
+CLOB_API_KEY=YOUR_CLOB_API_KEY
+CLOB_SECRET=YOUR_CLOB_SECRET
+CLOB_PASS_PHRASE=YOUR_CLOB_PASSPHRASE
 CHROMA_PERSIST_DIR=.chroma
+GROQ_API_KEY=YOUR_GROQ_API_KEY
 ```
+
+Create a local `.env` file (do not commit this to GitHub) and paste your credentials there.
 
 ---
 
-## 🚀 Running the Server
+## 🚀 Running the MCP Server
 
 ```bash
-python server.py  # or main.py if renamed
+python server.py
 ```
 
-Expected output:
+Output:
 
 ```
 [MCP] polygon-custom-mcp listening on stdio...
@@ -144,15 +161,17 @@ Expected output:
 
 ---
 
-## ⏳ Running the Client
+## 💻 Running the CLI Client
 
 ```bash
 python client.py
 ```
 
-You’ll be prompted to paste your Groq API key and begin chatting with the agent.
+* Prompts for Groq API key.
+* Starts interactive multi-turn chat.
+* Accepts multi-line input.
 
-**Example queries:**
+### Example queries:
 
 * "What is the probability that Trump extends the tariff pause in 30 days?"
 * "Forecast for market 0x1234 for 7, 30, 90 days."
@@ -166,26 +185,58 @@ You’ll be prompted to paste your Groq API key and begin chatting with the agen
 1. Agent identifies relevant market via `list_all_prediction_markets()`
 2. Extracts `condition_id`
 3. Forecasts outcome probabilities via `forecast_scenario_probabilities()`
-4. Structures results in Markdown table with horizon-wise probabilities
-5. Responds with a reasoning + output block
+4. Outputs results as Markdown tables with explanation
 
 ---
 
-## 📅 Project Structure
+## 🖥 MCP Integration with Claude Desktop
+
+To use this with Claude Desktop (or other MCP-compatible apps):
+
+1. Navigate to your Claude config:
+
+   * Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+   * macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+2. Add this block:
+
+```json
+{
+  "mcpServers": {
+    "polygon-custom-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp",
+        "run",
+        "main.py"
+      ]
+    }
+  }
+}
+```
+
+> 🔐 Replace the file paths and arguments accordingly. Use double backslashes on Windows.
+
+> 🐳 For other integrations like Brave Web Search, Docker must be installed: [Docker install guide](https://docs.docker.com/get-docker/)
+
+---
+
+## 📁 Project Structure
 
 ```
 polygon-custom-mcp/
-├── client.py         # CLI chat agent
-├── server.py         # MCP server and tool definitions
-├── requirements.txt  # Dependencies
-├── .env              # API keys (not checked in)
-└── README.md         # Documentation (this file)
+├── client.py          # CLI chat agent
+├── server.py          # MCP server with tool definitions
+├── requirements.txt   # Python dependencies
+├── .env.example       # Example env file (do not commit real .env)
+└── README.md          # Project documentation
 ```
 
 ---
 
 ## ✊ Credits
 
-* Groq + LangChain for lightning-fast LLM interface
-* Polymarket for market APIs
-* FastMCP for standardizing AI ↔ tool communication
+* **Groq + LangChain** for fast LLM orchestration
+* **Polymarket** for decentralized prediction market data
+* **FastMCP** for tool integration architecture
