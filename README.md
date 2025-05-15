@@ -209,7 +209,7 @@ To use this with Claude Desktop (or other MCP-compatible apps):
         "--directory",
         "C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp",
         "run",
-        "main.py"
+        "server.py"
       ]
     }
   }
