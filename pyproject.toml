@@ -8,11 +8,20 @@ dependencies = [
     "chromadb>=1.0.8",
     "langchain>=0.3.25",
     "langchain-community>=0.3.23",
+    "langchain-groq>=0.3.2",
+    "langchain-mcp-adapters>=0.0.11",
+    "langgraph>=0.4.3",
     "mcp-server>=0.1.4",
     "mcp[cli]>=1.6.0",
     "plotly>=6.0.1",
     "py-clob-client>=0.20.0",
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
+    "rich>=14.0.0",
     "sentence-transformers>=4.1.0",
+    "statsmodels>=0.14.4",
+    "ta-lib",
 ]
+
+[tool.uv.sources]
+ta-lib = { path = "ta_lib-0.6.3-cp312-cp312-win_amd64.whl" }
