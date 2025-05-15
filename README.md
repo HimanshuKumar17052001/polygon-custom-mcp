@@ -8,6 +8,8 @@ A powerful MCP server and CLI-based AI client for interacting with Polymarket's 
 
 ## 🔎 Overview
 
+Learn more about the [Model Context Protocol (MCP)](modelcontextprotocol.io/introduction)
+
 This project includes:
 
 ### ✅ MCP Server
