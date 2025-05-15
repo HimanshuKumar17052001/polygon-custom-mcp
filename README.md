@@ -228,11 +228,17 @@ To use this with Claude Desktop (or other MCP-compatible apps):
 
 ```
 polygon-custom-mcp/
-├── client.py          # CLI chat agent
-├── server.py          # MCP server with tool definitions
-├── requirements.txt   # Python dependencies
-├── .env.example       # Example env file (do not commit real .env)
-└── README.md          # Project documentation
+├── client.py             # CLI chat agent using LangChain and Groq
+├── server.py             # Main MCP server with tool implementations and FastMCP integration
+├── get_api.py            # Handles retrieval of Polymarket API credentials via py-clob-client
+├── index.py              # Indexes market data using Chroma DB, manages embedding and storage
+├── requirements.txt      # Python dependencies
+├── pyproject.toml        # Project metadata (used with uv or pipx)
+├── testing.ipynb         # Jupyter notebook for experiments and manual tool testing
+├── .env                  # Environment config file with credentials (excluded from version control)
+├── uv.lock               # Lockfile for uv package manager
+├── README.md             # Project documentation
+```          # Project documentation
 ```
 
 ---
