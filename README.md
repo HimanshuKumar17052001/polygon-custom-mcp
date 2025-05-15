@@ -1,178 +1,191 @@
 # polygon-custom-mcp
 
-A custom MCP server for Polymarket's CLOB API, built with Python and uv.
+A powerful MCP server and CLI-based AI client for interacting with **Polymarket's CLOB API**. This tool enables intelligent querying, forecasting, and visualization of prediction markets using AI and time-series forecasting tools.
 
-## Overview
+---
 
-This MCP server exposes three tools to Claude (or any MCP-compatible client):
+## 🔎 Overview
 
-* `list_all_prediction_markets`: Search prediction markets by keyword
-* `list_prediction_market_orderbook`: Fetch live orderbook (best bid/ask) for each outcome
-* `list_prediction_market_graph`: Retrieve historical price series for a market
+This project includes:
 
-## Prerequisites
+### ✅ MCP Server
 
-- OS: Windows, macOS, or Linux
-- Python: 3.8+
-- uv package manager (installed globally)
-- Virtual environment (recommended)
-- Environment variables (in a `.env` file):
+Implements the **Model Context Protocol (MCP)** using the FastMCP framework. Exposes tools that access Polymarket's prediction markets and apply analytics.
 
-```
-CLOB_HOST=https://clob.polymarket.com
-PK=<your-Polymarket-private-key>
-CLOB_API_KEY=<your-API-key>
-CLOB_SECRET=<your-API-secret>
-CLOB_PASS_PHRASE=<your-API-passphrase>
-GROQ_API_KEY=<your-API-key>
-```
+### 🧱 MCP Client
 
-## Project Structure
+A command-line interface that uses a **Groq-hosted LLM** and LangChain ReAct Agent to interactively query prediction markets using the server's tools.
 
-```
-polygon-custom-mcp/
-├── main.py
-├── requirements.txt
-├── .env
-└── README.md
-```
+---
 
-* `main.py`: MCP server implementation
-* `requirements.txt`: Python dependencies
-* `.env`: your Polymarket credentials (never commit to Git!)
+## 🛌 Server Tooling Summary
 
-## Installation
+### Available Tools (Defined in `server.py`):
 
-### 1. Install the uv CLI
+1. **list\_all\_prediction\_markets(query, condition\_id)**
 
-Windows (PowerShell as Administrator):
-```
-irm https://astral.sh/uv/install.ps1 | iex
-```
+   * Search or retrieve prediction markets by keyword or condition ID.
+   * Uses Chroma vector DB + Polymarket CLOB API.
 
-macOS / Linux (bash, zsh, etc.):
-```
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+2. **list\_prediction\_market\_orderbooks(condition\_ids: List\[str])**
 
-Or via pip / pipx:
-```
-pip install uv
-pipx install uv
-```
+   * Concurrently fetches live orderbooks (bid/ask, spreads, volumes) for multiple markets.
+   * Uses `asyncio.gather()` with `py-clob-client`.
 
-### 2. Clone & Set Up the Project
+3. **list\_prediction\_market\_graph(condition\_id, interval, fidelity, start\_ts, end\_ts)**
 
-```
+   * Returns historical time-series price data for Yes/No outcomes.
+   * Fetches from Polymarket's `/prices-history` endpoint.
+
+4. **forecast\_scenario\_probabilities(condition\_id, time\_horizons\_days)**
+
+   * Forecasts future Yes/No outcome probabilities using **ARIMA** time series modeling (via `statsmodels`).
+   * Steps: Fetch graph → resample to daily → auto-select ARIMA(p,d,q) → forecast.
+
+---
+
+## 🛌 Client Capabilities (`client.py`)
+
+### 🪧 Features
+
+* Uses `ChatGroq` model (`qwen-qwq-32b`) via LangChain.
+* Loads tools dynamically using `load_mcp_tools()`.
+* Renders outputs as Markdown tables in terminal using `rich`.
+* Accepts **multi-line queries** via `Ctrl+D` (Linux/macOS) or `Ctrl+Z + Enter` (Windows).
+* Persists conversation history and context for multi-step ReAct flows.
+
+### ⚖️ Tools Used in Client
+
+* **LangChain** + **LangGraph**: For tool agent and ReAct pattern.
+* **langchain\_groq**: For LLM access via Groq API.
+* **rich**: For beautiful CLI formatting.
+* **mcp**: For client/server MCP protocol management.
+
+### 🔨 Client Workflow:
+
+1. Initializes Groq LLM and MCP connection.
+2. Loads all available tools from the server.
+3. Constructs a LangChain ReAct agent with those tools.
+4. Accepts multi-line user input.
+5. Sends message history to LLM for action + tool invocation.
+6. Renders structured responses as formatted Markdown.
+
+---
+
+## ♻️ Technologies & Libraries
+
+### Server:
+
+* **Python 3.8+**
+* `mcp[cli]`: FastMCP server framework
+* `py-clob-client`: SDK for Polymarket CLOB API
+* `requests`: For HTTP calls
+* `chromadb`: Vector DB for semantic search
+* `statsmodels`, `pandas`, `numpy`: Time series forecasting (ARIMA)
+* `.env` config: Loads API keys and credentials
+
+### Client:
+
+* `langchain`, `langgraph`, `langchain_groq`: Agent + LLM orchestrator
+* `mcp`: Client session handling
+* `rich`: CLI formatting
+
+---
+
+## 🌐 Polymarket APIs Used
+
+* `GET /markets/{condition_id}`
+* `GET /orderbook/{token_id}`
+* `GET /prices-history`
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the Project
+
+```bash
 git clone https://github.com/himanshu/polygon-custom-mcp.git
 cd polygon-custom-mcp
 ```
 
-### 3. Initialize your uv project
+### 2. Set Up Environment
 
-```
-uv init
-```
-
-### 4. Create & activate a virtual environment
-
-Windows PowerShell:
-```
+```bash
 python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-macOS / Linux:
-```
-python -m venv venv
-source venv/bin/activate
-```
-
-### 5. Install dependencies
-
-```
-uv add mcp[cli] py-clob-client python-dotenv requests
-```
-
--- OR --
-
-```
+source venv/bin/activate  # or .\venv\Scripts\Activate.ps1 on Windows
 pip install -r requirements.txt
 ```
 
-## Configuring Claude Desktop with our custom MCP and Brave Web Search MCP 
-
-For Claude Desktop, edit your `claude_desktop_config.json` file:
-- Windows: Located at `%APPDATA%\Claude\claude_desktop_config.json`
-- macOS: Located at `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-Add the following to your configuration file (replace the directory path with your actual project location):
-
-```json
-{
-  "mcpServers": {
-    "brave-search": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "BRAVE_API_KEY",
-        "mcp/brave-search"
-      ],
-      "env": {
-        "BRAVE_API_KEY": "YOUR_API_KEY"
-      }
-    },
-    "polygon-custom-mcp": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp",
-        "run",
-        "main.py"
-      ]
-    }
-  }
-}
-```
-
-**Important Notes:**
-
-- To use the **Brave Search** MCP tool, you **must** have **Docker installed** on your machine. See the [official Docker installation guide](https://docs.docker.com/get-docker/) for instructions.
-- Replace `YOUR_API_KEY` with your actual Brave Search API key.
-- Replace `C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp` with the path to your project directory.
-- Use double backslashes (`\\`) for Windows file paths in JSON.
-
-
-## Running the Server
+### 3. Add Your Secrets to `.env`
 
 ```
-uv run main.py
+CLOB_HOST=https://clob.polymarket.com
+PK=<your-private-key>
+CLOB_API_KEY=<api-key>
+CLOB_SECRET=<secret>
+CLOB_PASS_PHRASE=<passphrase>
+CHROMA_PERSIST_DIR=.chroma
 ```
 
-You should see:
+---
+
+## 🚀 Running the Server
+
+```bash
+python server.py  # or main.py if renamed
+```
+
+Expected output:
+
 ```
 [MCP] polygon-custom-mcp listening on stdio...
 ```
 
-## Testing the Tools in Claude Desktop
+---
 
-Once you have set up the MCP server:
+## ⏳ Running the Client
 
-1. Start the server by running `uv run main.py` in your terminal
-2. Launch Claude Desktop
-3. In the Claude Desktop interface, you can interact with the Polymarket tools and Brave Web Search using natural language:
+```bash
+python client.py
+```
 
-For example, you can ask Claude:
-- "Search for Bitcoin prediction markets on Polymarket"
-- "What's the current orderbook for the market with condition ID 0x1234...?"
-- "Show me the price history for market 0xabcd... over the past week"
+You’ll be prompted to paste your Groq API key and begin chatting with the agent.
 
-Claude will automatically utilize the appropriate Polymarket tools and Brave Web Search to fetch and display the requested information.
+**Example queries:**
 
-Notes:
-- For `list_prediction_market_orderbook` and `list_prediction_market_graph` commands, you'll need to provide a valid Polymarket condition ID v.i.z. ID of the market
-- You can find condition IDs by first searching for markets using the `list_all_prediction_markets` functionality
-- If MCP fails to load in Claude Desktop, then quit the Claude Desktop and launch it again, it would be fixed
+* "What is the probability that Trump extends the tariff pause in 30 days?"
+* "Forecast for market 0x1234 for 7, 30, 90 days."
+
+---
+
+## 🧪 Example Use Case
+
+> "Here is my portfolio of mutual funds. How would Trump’s tariff extension scenario affect ROI?"
+
+1. Agent identifies relevant market via `list_all_prediction_markets()`
+2. Extracts `condition_id`
+3. Forecasts outcome probabilities via `forecast_scenario_probabilities()`
+4. Structures results in Markdown table with horizon-wise probabilities
+5. Responds with a reasoning + output block
+
+---
+
+## 📅 Project Structure
+
+```
+polygon-custom-mcp/
+├── client.py         # CLI chat agent
+├── server.py         # MCP server and tool definitions
+├── requirements.txt  # Dependencies
+├── .env              # API keys (not checked in)
+└── README.md         # Documentation (this file)
+```
+
+---
+
+## ✊ Credits
+
+* Groq + LangChain for lightning-fast LLM interface
+* Polymarket for market APIs
+* FastMCP for standardizing AI ↔ tool communication
