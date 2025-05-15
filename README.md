@@ -24,6 +24,7 @@ PK=<your-Polymarket-private-key>
 CLOB_API_KEY=<your-API-key>
 CLOB_SECRET=<your-API-secret>
 CLOB_PASS_PHRASE=<your-API-passphrase>
+GROQ_API_KEY=<your-API-key>
 ```
 
 ## Project Structure
@@ -130,7 +131,7 @@ Add the following to your configuration file (replace the directory path with yo
         "--directory",
         "C:\\Users\\YourUsername\\path\\to\\polygon-custom-mcp",
         "run",
-        "server.py"
+        "main.py"
       ]
     }
   }
